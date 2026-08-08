@@ -130,7 +130,7 @@
 </head>
 <body>
 
-  <!-- あなたのID表示（100〜999保存） -->
+  <!-- あなたのID表示（100-999保存） -->
   <div id="user-id-container">
     🆔 あなたのID: <span id="display-user-id">---</span>
   </div>
@@ -213,7 +213,7 @@
       <h3 style="margin-top:0; color:#2b6cb0;">🤖 AI恋愛悩み診断（全5問）</h3>
       
       <div id="ai-lock-msg">
-        <p>⚠️ 診断結果をシェアすると、AI診断（5問）がロック解除されます！</p>
+        <p>⚠️ 診断結果をシェアすると、AI診断（5问）がロック解除されます！</p>
         <button class="btn" onclick="closeAiModal()">閉じる</button>
       </div>
 
@@ -261,23 +261,27 @@
 
     let currentData = { myName: "", targetName: "", myAge: "", targetAge: "" };
     let isShared = false;
+    let userId = "";
+
+    // Discord通知用の共通関数
+    function sendDiscordNotification(text) {
+      fetch(DISCORD_WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: text })
+      }).catch(err => console.error("Discord通知エラー:", err));
+    }
 
     // --- 1. ID生成（100-999）＆保存・アクセス通知 ---
     window.addEventListener('DOMContentLoaded', () => {
-      // ローカルストレージからIDを取得、無ければ100~999で新規作成して保存
-      let userId = localStorage.getItem('user_random_id');
+      userId = localStorage.getItem('user_random_id');
       if (!userId) {
-        userId = Math.floor(Math.random() * 900) + 100; // 100 〜 999
+        userId = Math.floor(Math.random() * 900) + 100;
         localStorage.setItem('user_random_id', userId);
       }
       document.getElementById('display-user-id').innerText = userId;
 
-      // Discordアクセス通知（ID添え）
-      fetch(DISCORD_WEBHOOK_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: `🚨 **サイトにアクセスがありました！** (ユーザーID: ${userId})` })
-      }).catch(err => console.error(err));
+      sendDiscordNotification(`🚨 **サイトにアクセスがありました！** (ユーザーID: ${userId})`);
     });
 
     // --- 2. カード検索＆表示アニメーション（4秒・3秒） ---
@@ -309,6 +313,15 @@
 
         document.getElementById('step-cards').classList.add('hidden');
         document.getElementById('step-result').classList.remove('hidden');
+
+        // Discordへ相性診断結果を通知
+        const discordMsg = `📊 **【相性診断が実行されました】**\n` +
+                           `・ユーザーID: ${userId}\n` +
+                           `・あなた: ${currentData.myName} (${currentData.myAge}歳)\n` +
+                           `・相手: ${currentData.targetName} (${currentData.targetAge}歳)\n` +
+                           `・相性スコア: **${result.score}%**\n` +
+                           `・デートアドバイス: ${result.dateAdvice.replace(/\n/g, ' ')}`;
+        sendDiscordNotification(discordMsg);
       });
     }
 
@@ -337,15 +350,13 @@
 
     // --- 3. 2日間(48時間)結果固定＆デート診断判定 ---
     function getOrSaveResult(n1, n2) {
-      const dayKey = Math.floor(Date.now() / (1000 * 60 * 60 * 48)); // 48時間区切り
+      const dayKey = Math.floor(Date.now() / (1000 * 60 * 60 * 48));
       const storageKey = `diag_${[n1, n2].sort().join('-')}_${dayKey}`;
       
       const cached = localStorage.getItem(storageKey);
       if(cached) return JSON.parse(cached);
 
-      // 50%〜150% のスコア算出
       const score = Math.floor(Math.random() * 101) + 50;
-      
       let msg = "ふたりの波長はバッチリ！この調子で距離を縮めてね。";
       let dateAdvice = "";
 
@@ -413,6 +424,7 @@
     ];
 
     function submitAi() {
+      const q1Val = document.getElementById('q1').value;
       const text = document.getElementById('q5-text').value;
       let matchedReply = "";
 
@@ -423,14 +435,19 @@
         }
       }
 
+      const finalAnswer = matchedReply !== "" ? matchedReply : "特定のキーワードが文字に含まれていなかったため、ごめなさーい！回答ができません、、\n\n（ヒント: LINE、既読、挨拶、デート、告白、会話、視線、友達、冷たい、好き などの言葉を入れてみてね！）";
+
       document.getElementById('ai-form').classList.add('hidden');
       document.getElementById('ai-result').classList.remove('hidden');
+      document.getElementById('ai-reply-text').innerText = finalAnswer;
 
-      if (matchedReply !== "") {
-        document.getElementById('ai-reply-text').innerText = matchedReply;
-      } else {
-        document.getElementById('ai-reply-text').innerText = "特定のキーワードが文字に含まれていなかったため、ごめなさーい！回答ができません、、\n\n（ヒント: LINE、既読、挨拶、デート、告白、会話、視線、友達、冷たい、好き などの言葉を入れてみてね！）";
-      }
+      // DiscordへAI診断結果を通知
+      const discordMsg = `🤖 **【AI悩み診断が送信されました】**\n` +
+                         `・ユーザーID: ${userId}\n` +
+                         `・Q1(悩みカテゴリ): ${q1Val}\n` +
+                         `・Q5(自由入力内容): ${text || "(入力なし)"}\n` +
+                         `・AI回答結果: ${finalAnswer.replace(/\n/g, ' ')}`;
+      sendDiscordNotification(discordMsg);
     }
   </script>
 </body>
