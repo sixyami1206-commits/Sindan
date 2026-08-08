@@ -5,21 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>🩵あなたとあの人の相性ゲージ診断👍</title>
   <style>
-    /* 全体デザイン（水色・恋愛テーマ） */
     :root {
-      --primary-color: #70d6ff;
-      --accent-color: #ff70a6;
-      --bg-color: #e8f7ff;
+      --primary: #70d6ff;
+      --accent: #ff70a6;
+      --bg: #e8f7ff;
       --card-bg: #ffffff;
-      --text-color: #334e68;
+      --text: #334e68;
     }
 
     body {
       margin: 0;
       padding: 20px 10px 80px 10px;
-      font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', meiryo, sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-color);
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -27,17 +26,17 @@
       box-sizing: border-box;
     }
 
-    /* 右上アクセス数表示 */
-    #counter-container {
+    /* 右上ユーザーID表示 */
+    #user-id-container {
       position: fixed;
       top: 12px;
       right: 12px;
-      background: rgba(255, 255, 255, 0.9);
-      border: 2px solid var(--primary-color);
+      background: rgba(255, 255, 255, 0.95);
+      border: 2px solid var(--primary);
       padding: 6px 14px;
       border-radius: 20px;
       font-weight: bold;
-      font-size: 14px;
+      font-size: 13px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.05);
       z-index: 100;
     }
@@ -52,171 +51,94 @@
       border: 3px solid #b8ebd0;
       text-align: center;
       box-sizing: border-box;
-      margin-top: 40px;
+      margin-top: 35px;
     }
 
-    h1 {
-      font-size: 20px;
-      color: #2b6cb0;
-      margin-bottom: 20px;
-      line-height: 1.4;
-    }
-
-    .input-group {
-      margin-bottom: 14px;
-      text-align: left;
-    }
-
-    label {
-      display: block;
-      font-size: 13px;
-      font-weight: bold;
-      color: #4a5568;
-      margin-bottom: 4px;
-    }
-
+    h1 { font-size: 20px; color: #2b6cb0; margin-bottom: 20px; }
+    
+    .input-group { margin-bottom: 12px; text-align: left; }
+    label { display: block; font-size: 12px; font-weight: bold; color: #4a5568; margin-bottom: 4px; }
     input, select, textarea {
-      width: 100%;
-      padding: 12px;
-      border: 2px solid #e2e8f0;
-      border-radius: 12px;
-      box-sizing: border-box;
-      font-size: 15px;
-      outline: none;
-      transition: border-color 0.2s;
+      width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 12px;
+      box-sizing: border-box; font-size: 14px; outline: none;
     }
-
-    input:focus, select:focus, textarea:focus {
-      border-color: var(--primary-color);
-    }
+    input:focus, select:focus, textarea:focus { border-color: var(--primary); }
 
     .btn {
-      background: linear-gradient(135deg, var(--primary-color), #4ea8de);
-      color: white;
-      border: none;
-      padding: 14px 24px;
-      border-radius: 30px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      width: 100%;
-      box-shadow: 0 4px 12px rgba(112, 214, 255, 0.4);
-      margin-top: 10px;
-      transition: transform 0.1s;
+      background: linear-gradient(135deg, var(--primary), #4ea8de);
+      color: white; border: none; padding: 14px 20px; border-radius: 30px;
+      font-size: 15px; font-weight: bold; cursor: pointer; width: 100%;
+      box-shadow: 0 4px 12px rgba(112, 214, 255, 0.4); margin-top: 10px;
     }
+    .btn:active { transform: scale(0.98); }
 
-    .btn:active {
-      transform: scale(0.98);
-    }
-
-    /* カード選択スタイル */
-    .cards-container {
-      display: flex;
-      justify-content: space-around;
+    /* カード7枚のグリッドレイアウト */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
       margin: 20px 0;
     }
-
     .card {
-      width: 80px;
-      height: 120px;
       background: linear-gradient(135deg, #a0c4ff, #bdb2ff);
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 28px;
-      color: white;
-      cursor: pointer;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      transition: transform 0.2s, background 0.2s;
-      border: 2px solid #fff;
+      border: 2px solid white; height: 75px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; color: white; cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1); transition: transform 0.2s;
+    }
+    .card:hover { transform: translateY(-4px); }
+
+    /* 結果エリア */
+    .result-score { font-size: 42px; font-weight: 900; color: var(--accent); margin: 10px 0; }
+    .date-box {
+      background: #fff0f5; border: 2px dashed var(--accent);
+      padding: 12px; border-radius: 12px; margin: 15px 0; font-weight: bold; white-space: pre-wrap;
     }
 
-    .card:hover {
-      transform: translateY(-5px);
+    /* アニメーション用オーバーレイ */
+    #overlay {
+      position: fixed; top:0; left:0; width:100%; height:100%;
+      background: rgba(255,255,255,0.92); display: none;
+      flex-direction: column; justify-content: center; align-items: center;
+      z-index: 1000; padding: 20px; box-sizing: border-box; text-align: center;
     }
-
-    /* 結果表示 */
-    .result-score {
-      font-size: 42px;
-      font-weight: 900;
-      color: var(--accent-color);
-      margin: 15px 0;
-      text-shadow: 2px 2px 0px #ffc6ff;
+    .loading-spinner {
+      width: 50px; height: 50px; border: 5px solid #f3f3f3;
+      border-top: 5px solid var(--primary); border-radius: 50%;
+      animation: spin 1s linear infinite; margin-bottom: 20px;
     }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-    .result-text {
-      font-size: 16px;
-      background: #f0f9ff;
-      padding: 14px;
-      border-radius: 12px;
-      border-left: 4px solid var(--primary-color);
-      margin-bottom: 20px;
-      line-height: 1.5;
-    }
-
-    /* シェアボタン */
-    .btn-share {
-      background: #000;
-      color: #fff;
-    }
-
-    /* 右下AI診断固定ボタン */
-    #ai-floating-btn {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: linear-gradient(135deg, #ff70a6, #ff9770);
-      color: white;
-      padding: 12px 20px;
-      border-radius: 30px;
-      font-weight: bold;
-      font-size: 14px;
-      box-shadow: 0 6px 16px rgba(255, 112, 166, 0.4);
-      cursor: pointer;
-      z-index: 99;
-      border: 2px solid white;
-    }
-
-    /* AI診断モーダル */
+    /* モーダル共通 */
     .modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5);
-      z-index: 1000;
-      justify-content: center;
-      align-items: center;
-      padding: 15px;
-      box-sizing: border-box;
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box;
     }
-
     .modal-content {
-      background: white;
-      border-radius: 20px;
-      padding: 20px;
-      width: 100%;
-      max-width: 400px;
-      max-height: 90vh;
-      overflow-y: auto;
-      box-sizing: border-box;
-      text-align: left;
+      background: white; border-radius: 20px; padding: 20px; width: 100%; max-width: 400px;
+      max-height: 85vh; overflow-y: auto; box-sizing: border-box; text-align: left;
     }
 
-    .hidden { display: none; }
+    #ai-floating-btn {
+      position: fixed; bottom: 20px; right: 20px;
+      background: linear-gradient(135deg, #ff70a6, #ff9770); color: white;
+      padding: 12px 20px; border-radius: 30px; font-weight: bold; font-size: 14px;
+      box-shadow: 0 6px 16px rgba(255, 112, 166, 0.4); cursor: pointer; z-index: 99; border: 2px solid white;
+    }
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
 
-  <!-- 右上アクセス数表示（0.5秒更新） -->
-  <div id="counter-container">
-    👀 アクセス数: <span id="access-count">1</span>
+  <!-- あなたのID表示（100〜999保存） -->
+  <div id="user-id-container">
+    🆔 あなたのID: <span id="display-user-id">---</span>
   </div>
 
   <div class="container">
     <h1>🩵あなたとあの人の相性ゲージ診断👍</h1>
 
-    <!-- 入力フォーム画面 -->
+    <!-- ステップ1: 入力（名前＋年齢） -->
     <div id="step-input">
       <div class="input-group">
         <label>あなたのなまえ</label>
@@ -228,39 +150,62 @@
       </div>
       <div class="input-group">
         <label>あなたの年齢</label>
-        <input type="number" id="my-age" placeholder="17">
+        <input type="number" id="my-age" placeholder="例：17">
       </div>
       <div class="input-group">
         <label>相手の年齢</label>
-        <input type="number" id="target-age" placeholder="18">
+        <input type="number" id="target-age" placeholder="例：18">
       </div>
-      <button class="btn" onclick="goToCards()">カードを選びに行く✨</button>
+      <button class="btn" onclick="startSearch()">カードを探す✨</button>
     </div>
 
-    <!-- カード選択画面 -->
+    <!-- ステップ2: 7枚のカード選択 -->
     <div id="step-cards" class="hidden">
-      <p style="font-weight:bold;">直感でカードを1枚選んでね！</p>
-      <div class="cards-container">
-        <div class="card" onclick="selectCard()">🩵</div>
-        <div class="card" onclick="selectCard()">✨</div>
-        <div class="card" onclick="selectCard()">🌙</div>
+      <p style="font-weight:bold;">直感でカードを1枚選んでね！(全7枚)</p>
+      <div class="cards-grid">
+        <div class="card" onclick="selectCard(1)">🩵</div>
+        <div class="card" onclick="selectCard(2)">✨</div>
+        <div class="card" onclick="selectCard(3)">🌙</div>
+        <div class="card" onclick="selectCard(4)">💌</div>
+        <div class="card" onclick="selectCard(5)">💎</div>
+        <div class="card" onclick="selectCard(6)">🌸</div>
+        <div class="card" onclick="selectCard(7)">⭐</div>
       </div>
     </div>
 
-    <!-- 結果表示画面 -->
+    <!-- ステップ3: 診断結果 -->
     <div id="step-result" class="hidden">
       <p style="font-weight:bold; color:#718096; margin:0;">相性メーター</p>
-      <div class="result-score" id="result-score">0%</div>
-      <div class="result-text" id="result-text">---</div>
+      <div class="result-score" id="result-score">50%</div>
+      <div id="result-msg" style="background:#f0f9ff; padding:12px; border-radius:12px; margin-bottom:12px; font-size:14px;"></div>
+      
+      <!-- デートタイミング診断結果 -->
+      <div class="date-box" id="date-advice"></div>
 
-      <button class="btn btn-share" onclick="shareResult()">結果をSNSでシェアしてAI診断を解放🔓</button>
+      <button class="btn" style="background:#000;" onclick="openShareModal()">結果をSNSでシェアしてAI診断を解放🔓</button>
+    </div>
+  </div>
+
+  <!-- アニメーション用画面（4秒/3秒） -->
+  <div id="overlay">
+    <div class="loading-spinner"></div>
+    <h3 id="overlay-text" style="color:#2b6cb0; margin-bottom:10px;">処理中...</h3>
+    <div style="font-size:32px; font-weight:bold; color:var(--accent);" id="overlay-percent">0%</div>
+  </div>
+
+  <!-- シェアモーダル（X, Instagram専用） -->
+  <div id="share-modal" class="modal">
+    <div class="modal-content" style="text-align:center;">
+      <h3>SNSでシェアしてAI診断を解放</h3>
+      <p style="font-size:13px; color:#666;">シェア画面を開いて戻ってくると完了します！</p>
+      <button class="btn" style="background:#1DA1F2;" onclick="shareTo('X')">X（旧Twitter）でポスト</button>
+      <button class="btn" style="background:linear-gradient(45deg, #f09433, #bc1888);" onclick="shareTo('IG')">Instagram ストーリーズ</button>
+      <button class="btn" style="background:#cbd5e0; margin-top:8px;" onclick="closeShareModal()">閉じる</button>
     </div>
   </div>
 
   <!-- 右下AI診断固定ボタン -->
-  <div id="ai-floating-btn" onclick="openAiModal()">
-    🤖 AI恋愛診断
-  </div>
+  <div id="ai-floating-btn" onclick="openAiModal()">🤖 AI恋愛診断</div>
 
   <!-- AI診断モーダル（5問） -->
   <div id="ai-modal" class="modal">
@@ -283,36 +228,30 @@
             <option value="その他">その他（下に記述）</option>
           </select>
         </div>
-
         <div class="input-group">
           <label>Q2. 連絡の頻度はどのくらい？</label>
           <input type="text" placeholder="例：毎日 / 週1回">
         </div>
-
         <div class="input-group">
           <label>Q3. 二人の関係性は？</label>
           <input type="text" placeholder="例：クラスメイト / 友達">
         </div>
-
         <div class="input-group">
           <label>Q4. 最後に会話したのはいつ？</label>
           <input type="text" placeholder="例：今日 / 1週間前">
         </div>
-
         <div class="input-group">
           <label>Q5. お悩み詳細（キーワードチェック）</label>
           <textarea id="q5-text" rows="3" placeholder="詳しく教えてね（特定のキーワードがないとAIが回答できません）"></textarea>
         </div>
-
         <button class="btn" onclick="submitAi()">AIに診断してもらう💭</button>
         <button class="btn" style="background:#cbd5e0; margin-top:6px;" onclick="closeAiModal()">キャンセル</button>
       </div>
 
-      <!-- AI回答表示 -->
       <div id="ai-result" class="hidden">
         <h4>🤖 AIからのアドバイス</h4>
-        <div id="ai-reply-text" class="result-text"></div>
-        <button class="btn" onclick="closeAiModal()">閉じる</button>
+        <div id="ai-reply-text" style="background:#f0f9ff; padding:12px; border-radius:12px; font-size:14px; border-left:4px solid var(--primary); white-space:pre-wrap;"></div>
+        <button class="btn" style="margin-top:10px;" onclick="closeAiModal()">閉じる</button>
       </div>
     </div>
   </div>
@@ -320,66 +259,131 @@
   <script>
     const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1529447601521299647/XbSfq7kLDeLB1LW-NeHwAzurzH6T-wWwVU4oAF_XoZ5HBQ4ps-zpKeD7vhX1fCq-_VY_";
 
-    // --- 1. アクセス通知 & アクセスカウンター (0.5秒更新) ---
-    // 画面を開いた瞬間にDiscordへ一度だけアクセス通知
+    let currentData = { myName: "", targetName: "", myAge: "", targetAge: "" };
+    let isShared = false;
+
+    // --- 1. ID生成（100-999）＆保存・アクセス通知 ---
     window.addEventListener('DOMContentLoaded', () => {
+      // ローカルストレージからIDを取得、無ければ100~999で新規作成して保存
+      let userId = localStorage.getItem('user_random_id');
+      if (!userId) {
+        userId = Math.floor(Math.random() * 900) + 100; // 100 〜 999
+        localStorage.setItem('user_random_id', userId);
+      }
+      document.getElementById('display-user-id').innerText = userId;
+
+      // Discordアクセス通知（ID添え）
       fetch(DISCORD_WEBHOOK_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          content: "🚨 **サイトに新しいアクセスがありました！**"
-        })
+        body: JSON.stringify({ content: `🚨 **サイトにアクセスがありました！** (ユーザーID: ${userId})` })
       }).catch(err => console.error(err));
     });
 
-    // アクセスカウンター擬似（0.5秒ごとに増加/変動）
-    let count = Math.floor(Math.random() * 10) + 10;
-    setInterval(() => {
-      count += Math.floor(Math.random() * 2);
-      document.getElementById('access-count').innerText = count;
-    }, 500);
+    // --- 2. カード検索＆表示アニメーション（4秒・3秒） ---
+    function startSearch() {
+      currentData.myName = document.getElementById('my-name').value;
+      currentData.targetName = document.getElementById('target-name').value;
+      currentData.myAge = document.getElementById('my-age').value;
+      currentData.targetAge = document.getElementById('target-age').value;
 
-    // --- 2. 診断処理 ---
-    let isShared = false;
-
-    const randomMessages = [
-      "今夜、ふとあなたのことを思い出してるかも…💭",
-      "視線が合ったらチャンス！かなり好印象です✨",
-      "相手もあなたからの連絡を待ってるかも！？📱",
-      "焦らずゆっくり距離を縮めていこう🌱",
-      "運命の歯車が動き出してる！自信を持って！"
-    ];
-
-    function goToCards() {
-      const myName = document.getElementById('my-name').value;
-      const targetName = document.getElementById('target-name').value;
-      if (!myName || !targetName) {
-        alert("あなたとお相手のお名前を入力してね！");
+      if(!currentData.myName || !currentData.targetName || !currentData.myAge || !currentData.targetAge) {
+        alert("すべての項目を入力してね！");
         return;
       }
-      document.getElementById('step-input').classList.add('hidden');
-      document.getElementById('step-cards').classList.remove('hidden');
+
+      const msg = `${currentData.myName}さんと${currentData.targetName}さんに最適なカードを探しています。`;
+      showOverlay(msg, 4000, () => {
+        document.getElementById('step-input').classList.add('hidden');
+        document.getElementById('step-cards').classList.remove('hidden');
+      });
     }
 
-    function selectCard() {
-      // 50%〜150% のランダム
+    function selectCard(cardNumber) {
+      showOverlay("表示確認中だよ", 3000, () => {
+        const result = getOrSaveResult(currentData.myName, currentData.targetName);
+        
+        document.getElementById('result-score').innerText = result.score + "%";
+        document.getElementById('result-msg').innerText = result.msg;
+        document.getElementById('date-advice').innerText = result.dateAdvice;
+
+        document.getElementById('step-cards').classList.add('hidden');
+        document.getElementById('step-result').classList.remove('hidden');
+      });
+    }
+
+    function showOverlay(text, duration, callback) {
+      const overlay = document.getElementById('overlay');
+      const textEl = document.getElementById('overlay-text');
+      const percentEl = document.getElementById('overlay-percent');
+      
+      overlay.style.display = 'flex';
+      textEl.innerText = text;
+      
+      let start = null;
+      function animate(timestamp) {
+        if (!start) start = timestamp;
+        let progress = Math.min((timestamp - start) / duration, 1);
+        percentEl.innerText = Math.floor(progress * 100) + "%";
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          overlay.style.display = 'none';
+          callback();
+        }
+      }
+      requestAnimationFrame(animate);
+    }
+
+    // --- 3. 2日間(48時間)結果固定＆デート診断判定 ---
+    function getOrSaveResult(n1, n2) {
+      const dayKey = Math.floor(Date.now() / (1000 * 60 * 60 * 48)); // 48時間区切り
+      const storageKey = `diag_${[n1, n2].sort().join('-')}_${dayKey}`;
+      
+      const cached = localStorage.getItem(storageKey);
+      if(cached) return JSON.parse(cached);
+
+      // 50%〜150% のスコア算出
       const score = Math.floor(Math.random() * 101) + 50;
-      const msg = randomMessages[Math.floor(Math.random() * randomMessages.length)];
+      
+      let msg = "ふたりの波長はバッチリ！この調子で距離を縮めてね。";
+      let dateAdvice = "";
 
-      document.getElementById('result-score').innerText = score + "%";
-      document.getElementById('result-text').innerText = msg;
+      if (score < 70) {
+        dateAdvice = "🛑 デート診断：まだ行かないほうがいいかも！\nまずはLINEや日常の挨拶で仲を深めるのが先決です。";
+      } else if (score < 100) {
+        const days = Math.floor(Math.random() * 5) + 7;
+        dateAdvice = `📅 デート診断：お誘いは【 ${days}日後 】が最適！\n焦らず自然な流れで口実を作ってみて。`;
+      } else {
+        const days = Math.floor(Math.random() * 3) + 1;
+        dateAdvice = `🔥 デート診断：今すぐ誘うべき！【 ${days}日後 】がベストタイミング！\n相性抜群なので自信を持ってOK！`;
+      }
 
-      document.getElementById('step-cards').classList.add('hidden');
-      document.getElementById('step-result').classList.remove('hidden');
+      const data = { score: score, msg: msg, dateAdvice: dateAdvice };
+      localStorage.setItem(storageKey, JSON.stringify(data));
+      return data;
     }
 
-    // シェアするとAI診断機能が解放される
-    function shareResult() {
+    // --- 4. シェア機能 (X, Instagram) ---
+    function openShareModal() { document.getElementById('share-modal').style.display = 'flex'; }
+    function closeShareModal() { document.getElementById('share-modal').style.display = 'none'; }
+
+    function shareTo(platform) {
+      const score = document.getElementById('result-score').innerText;
+      const shareText = `【🩵相性ゲージ診断👍】\n${currentData.myName}と${currentData.targetName}の相性は【${score}】でした！\n`;
+
+      if (platform === 'X') {
+        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`, '_blank');
+      } else if (platform === 'IG') {
+        window.open('instagram://story-camera', '_blank');
+      }
+
       isShared = true;
-      alert("シェアありがとうございます！右下の「AI恋愛診断」が解放されました🔓");
+      alert("シェアありがとうございます！AI診断が解放されました🔓");
+      closeShareModal();
     }
 
-    // --- 3. AI診断モーダル & キーワード判定 ---
+    // --- 5. 5問のAI診断機能 (キーワード判定付き) ---
     function openAiModal() {
       document.getElementById('ai-modal').style.display = 'flex';
       if (isShared) {
@@ -390,13 +394,11 @@
         document.getElementById('ai-form').classList.add('hidden');
       }
     }
-
     function closeAiModal() {
       document.getElementById('ai-modal').style.display = 'none';
       document.getElementById('ai-result').classList.add('hidden');
     }
 
-    // 10個の登録キーワードとそれに対応するメッセージ
     const keywordDatabase = [
       { key: "LINE", reply: "LINEの返信テンポを相手に合わせると、親近感がアップしますよ！" },
       { key: "既読", reply: "既読スルーされても焦らないで！忙しいだけの可能性が高いです。" },
@@ -414,7 +416,6 @@
       const text = document.getElementById('q5-text').value;
       let matchedReply = "";
 
-      // 入力テキストの中に登録キーワードが含まれているかチェック
       for (let item of keywordDatabase) {
         if (text.includes(item.key)) {
           matchedReply = `【キーワード：「${item.key}」について】\n${item.reply}`;
