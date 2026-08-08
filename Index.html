@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🩵あなたとあの人の相性ゲージ診断👍</title>
+  <style>
+    /* 全体デザイン（水色・恋愛テーマ） */
+    :root {
+      --primary-color: #70d6ff;
+      --accent-color: #ff70a6;
+      --bg-color: #e8f7ff;
+      --card-bg: #ffffff;
+      --text-color: #334e68;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px 10px 80px 10px;
+      font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', meiryo, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      box-sizing: border-box;
+    }
+
+    /* 右上アクセス数表示 */
+    #counter-container {
+      position: fixed;
+      top: 12px;
+      right: 12px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 2px solid var(--primary-color);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 14px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      z-index: 100;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 420px;
+      background: var(--card-bg);
+      border-radius: 24px;
+      padding: 24px 18px;
+      box-shadow: 0 10px 25px rgba(112, 214, 255, 0.25);
+      border: 3px solid #b8ebd0;
+      text-align: center;
+      box-sizing: border-box;
+      margin-top: 40px;
+    }
+
+    h1 {
+      font-size: 20px;
+      color: #2b6cb0;
+      margin-bottom: 20px;
+      line-height: 1.4;
+    }
+
+    .input-group {
+      margin-bottom: 14px;
+      text-align: left;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: bold;
+      color: #4a5568;
+      margin-bottom: 4px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      box-sizing: border-box;
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary-color);
+    }
+
+    .btn {
+      background: linear-gradient(135deg, var(--primary-color), #4ea8de);
+      color: white;
+      border: none;
+      padding: 14px 24px;
+      border-radius: 30px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      width: 100%;
+      box-shadow: 0 4px 12px rgba(112, 214, 255, 0.4);
+      margin-top: 10px;
+      transition: transform 0.1s;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    /* カード選択スタイル */
+    .cards-container {
+      display: flex;
+      justify-content: space-around;
+      margin: 20px 0;
+    }
+
+    .card {
+      width: 80px;
+      height: 120px;
+      background: linear-gradient(135deg, #a0c4ff, #bdb2ff);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      transition: transform 0.2s, background 0.2s;
+      border: 2px solid #fff;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    /* 結果表示 */
+    .result-score {
+      font-size: 42px;
+      font-weight: 900;
+      color: var(--accent-color);
+      margin: 15px 0;
+      text-shadow: 2px 2px 0px #ffc6ff;
+    }
+
+    .result-text {
+      font-size: 16px;
+      background: #f0f9ff;
+      padding: 14px;
+      border-radius: 12px;
+      border-left: 4px solid var(--primary-color);
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    /* シェアボタン */
+    .btn-share {
+      background: #000;
+      color: #fff;
+    }
+
+    /* 右下AI診断固定ボタン */
+    #ai-floating-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: linear-gradient(135deg, #ff70a6, #ff9770);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 30px;
+      font-weight: bold;
+      font-size: 14px;
+      box-shadow: 0 6px 16px rgba(255, 112, 166, 0.4);
+      cursor: pointer;
+      z-index: 99;
+      border: 2px solid white;
+    }
+
+    /* AI診断モーダル */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      padding: 15px;
+      box-sizing: border-box;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 20px;
+      padding: 20px;
+      width: 100%;
+      max-width: 400px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-sizing: border-box;
+      text-align: left;
+    }
+
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+
+  <!-- 右上アクセス数表示（0.5秒更新） -->
+  <div id="counter-container">
+    👀 アクセス数: <span id="access-count">1</span>
+  </div>
+
+  <div class="container">
+    <h1>🩵あなたとあの人の相性ゲージ診断👍</h1>
+
+    <!-- 入力フォーム画面 -->
+    <div id="step-input">
+      <div class="input-group">
+        <label>あなたのなまえ</label>
+        <input type="text" id="my-name" placeholder="例：あおい">
+      </div>
+      <div class="input-group">
+        <label>あいてのなまえ</label>
+        <input type="text" id="target-name" placeholder="例：れん">
+      </div>
+      <div class="input-group">
+        <label>あなたの年齢</label>
+        <input type="number" id="my-age" placeholder="17">
+      </div>
+      <div class="input-group">
+        <label>相手の年齢</label>
+        <input type="number" id="target-age" placeholder="18">
+      </div>
+      <button class="btn" onclick="goToCards()">カードを選びに行く✨</button>
+    </div>
+
+    <!-- カード選択画面 -->
+    <div id="step-cards" class="hidden">
+      <p style="font-weight:bold;">直感でカードを1枚選んでね！</p>
+      <div class="cards-container">
+        <div class="card" onclick="selectCard()">🩵</div>
+        <div class="card" onclick="selectCard()">✨</div>
+        <div class="card" onclick="selectCard()">🌙</div>
+      </div>
+    </div>
+
+    <!-- 結果表示画面 -->
+    <div id="step-result" class="hidden">
+      <p style="font-weight:bold; color:#718096; margin:0;">相性メーター</p>
+      <div class="result-score" id="result-score">0%</div>
+      <div class="result-text" id="result-text">---</div>
+
+      <button class="btn btn-share" onclick="shareResult()">結果をSNSでシェアしてAI診断を解放🔓</button>
+    </div>
+  </div>
+
+  <!-- 右下AI診断固定ボタン -->
+  <div id="ai-floating-btn" onclick="openAiModal()">
+    🤖 AI恋愛診断
+  </div>
+
+  <!-- AI診断モーダル（5問） -->
+  <div id="ai-modal" class="modal">
+    <div class="modal-content">
+      <h3 style="margin-top:0; color:#2b6cb0;">🤖 AI恋愛悩み診断（全5問）</h3>
+      
+      <div id="ai-lock-msg">
+        <p>⚠️ 診断結果をシェアすると、AI診断（5問）がロック解除されます！</p>
+        <button class="btn" onclick="closeAiModal()">閉じる</button>
+      </div>
+
+      <div id="ai-form" class="hidden">
+        <div class="input-group">
+          <label>Q1. あなたが困ってることはなに？</label>
+          <select id="q1">
+            <option value="話しかけれない">相手に上手く話しかけれない</option>
+            <option value="伝わらない">相手に想いが伝わらない</option>
+            <option value="わからなくなった">好きという想いがわからなくなった</option>
+            <option value="嫌われてる">嫌われてるかも</option>
+            <option value="その他">その他（下に記述）</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label>Q2. 連絡の頻度はどのくらい？</label>
+          <input type="text" placeholder="例：毎日 / 週1回">
+        </div>
+
+        <div class="input-group">
+          <label>Q3. 二人の関係性は？</label>
+          <input type="text" placeholder="例：クラスメイト / 友達">
+        </div>
+
+        <div class="input-group">
+          <label>Q4. 最後に会話したのはいつ？</label>
+          <input type="text" placeholder="例：今日 / 1週間前">
+        </div>
+
+        <div class="input-group">
+          <label>Q5. お悩み詳細（キーワードチェック）</label>
+          <textarea id="q5-text" rows="3" placeholder="詳しく教えてね（特定のキーワードがないとAIが回答できません）"></textarea>
+        </div>
+
+        <button class="btn" onclick="submitAi()">AIに診断してもらう💭</button>
+        <button class="btn" style="background:#cbd5e0; margin-top:6px;" onclick="closeAiModal()">キャンセル</button>
+      </div>
+
+      <!-- AI回答表示 -->
+      <div id="ai-result" class="hidden">
+        <h4>🤖 AIからのアドバイス</h4>
+        <div id="ai-reply-text" class="result-text"></div>
+        <button class="btn" onclick="closeAiModal()">閉じる</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1529447601521299647/XbSfq7kLDeLB1LW-NeHwAzurzH6T-wWwVU4oAF_XoZ5HBQ4ps-zpKeD7vhX1fCq-_VY_";
+
+    // --- 1. アクセス通知 & アクセスカウンター (0.5秒更新) ---
+    // 画面を開いた瞬間にDiscordへ一度だけアクセス通知
+    window.addEventListener('DOMContentLoaded', () => {
+      fetch(DISCORD_WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: "🚨 **サイトに新しいアクセスがありました！**"
+        })
+      }).catch(err => console.error(err));
+    });
+
+    // アクセスカウンター擬似（0.5秒ごとに増加/変動）
+    let count = Math.floor(Math.random() * 10) + 10;
+    setInterval(() => {
+      count += Math.floor(Math.random() * 2);
+      document.getElementById('access-count').innerText = count;
+    }, 500);
+
+    // --- 2. 診断処理 ---
+    let isShared = false;
+
+    const randomMessages = [
+      "今夜、ふとあなたのことを思い出してるかも…💭",
+      "視線が合ったらチャンス！かなり好印象です✨",
+      "相手もあなたからの連絡を待ってるかも！？📱",
+      "焦らずゆっくり距離を縮めていこう🌱",
+      "運命の歯車が動き出してる！自信を持って！"
+    ];
+
+    function goToCards() {
+      const myName = document.getElementById('my-name').value;
+      const targetName = document.getElementById('target-name').value;
+      if (!myName || !targetName) {
+        alert("あなたとお相手のお名前を入力してね！");
+        return;
+      }
+      document.getElementById('step-input').classList.add('hidden');
+      document.getElementById('step-cards').classList.remove('hidden');
+    }
+
+    function selectCard() {
+      // 50%〜150% のランダム
+      const score = Math.floor(Math.random() * 101) + 50;
+      const msg = randomMessages[Math.floor(Math.random() * randomMessages.length)];
+
+      document.getElementById('result-score').innerText = score + "%";
+      document.getElementById('result-text').innerText = msg;
+
+      document.getElementById('step-cards').classList.add('hidden');
+      document.getElementById('step-result').classList.remove('hidden');
+    }
+
+    // シェアするとAI診断機能が解放される
+    function shareResult() {
+      isShared = true;
+      alert("シェアありがとうございます！右下の「AI恋愛診断」が解放されました🔓");
+    }
+
+    // --- 3. AI診断モーダル & キーワード判定 ---
+    function openAiModal() {
+      document.getElementById('ai-modal').style.display = 'flex';
+      if (isShared) {
+        document.getElementById('ai-lock-msg').classList.add('hidden');
+        document.getElementById('ai-form').classList.remove('hidden');
+      } else {
+        document.getElementById('ai-lock-msg').classList.remove('hidden');
+        document.getElementById('ai-form').classList.add('hidden');
+      }
+    }
+
+    function closeAiModal() {
+      document.getElementById('ai-modal').style.display = 'none';
+      document.getElementById('ai-result').classList.add('hidden');
+    }
+
+    // 10個の登録キーワードとそれに対応するメッセージ
+    const keywordDatabase = [
+      { key: "LINE", reply: "LINEの返信テンポを相手に合わせると、親近感がアップしますよ！" },
+      { key: "既読", reply: "既読スルーされても焦らないで！忙しいだけの可能性が高いです。" },
+      { key: "挨拶", reply: "まずは毎日の「おはよう」から会話のきっかけを作ってみましょう。" },
+      { key: "デート", reply: "「あそこ行ってみたいんだよね」と軽いノリで誘うのがコツです。" },
+      { key: "告白", reply: "相手の反応をしっかり観察して、二人きりになれる場所を選びましょう。" },
+      { key: "会話", reply: "相手の趣味や好きな食べ物の質問を投げかけると会話が弾みます！" },
+      { key: "視線", reply: "よく目が合うなら、相手もあなたを意識している証拠かも。" },
+      { key: "友達", reply: "友達関係から一歩踏み出すには、ギャップを見せるのが効果的！" },
+      { key: "冷たい", reply: "急に冷たくなったと感じたら、少し時間を置いて様子を見てみて。" },
+      { key: "好き", reply: "自分の素直な気持ちを少しずつ言葉や行動に出していきましょう！" }
+    ];
+
+    function submitAi() {
+      const text = document.getElementById('q5-text').value;
+      let matchedReply = "";
+
+      // 入力テキストの中に登録キーワードが含まれているかチェック
+      for (let item of keywordDatabase) {
+        if (text.includes(item.key)) {
+          matchedReply = `【キーワード：「${item.key}」について】\n${item.reply}`;
+          break;
+        }
+      }
+
+      document.getElementById('ai-form').classList.add('hidden');
+      document.getElementById('ai-result').classList.remove('hidden');
+
+      if (matchedReply !== "") {
+        document.getElementById('ai-reply-text').innerText = matchedReply;
+      } else {
+        document.getElementById('ai-reply-text').innerText = "特定のキーワードが文字に含まれていなかったため、ごめなさーい！回答ができません、、\n\n（ヒント: LINE、既読、挨拶、デート、告白、会話、視線、友達、冷たい、好き などの言葉を入れてみてね！）";
+      }
+    }
+  </script>
+</body>
+</html>
+
