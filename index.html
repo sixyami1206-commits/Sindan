@@ -3,132 +3,94 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🩵あなたとあの人の相性ゲージ診断👍</title>
+  <title>🩵相性＆デート診断アプリ</title>
   <style>
     :root { --primary: #70d6ff; --accent: #ff70a6; --bg: #e8f7ff; --text: #334e68; }
     body { margin: 0; padding: 20px 10px 80px; font-family: sans-serif; background: var(--bg); color: var(--text); display: flex; flex-direction: column; align-items: center; }
-    .update-banner { background: #ffdfba; color: #d9480f; padding: 10px; border-radius: 12px; font-size: 13px; font-weight: bold; text-align: center; margin-bottom: 15px; border: 2px dashed #ff9770; width: 100%; max-width: 420px; }
-    #user-id-container { position: fixed; top: 12px; right: 12px; background: rgba(255, 255, 255, 0.95); border: 2px solid var(--primary); padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 13px; z-index: 100; }
     .container { width: 100%; max-width: 420px; background: white; border-radius: 24px; padding: 24px 18px; border: 3px solid #b8ebd0; text-align: center; box-sizing: border-box; }
     h1 { font-size: 20px; color: #2b6cb0; margin-bottom: 15px; }
     .input-group { margin-bottom: 12px; text-align: left; }
     label { display: block; font-size: 12px; font-weight: bold; color: #4a5568; margin-bottom: 4px; }
     input, select, textarea { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 12px; box-sizing: border-box; font-size: 14px; }
     .btn { background: linear-gradient(135deg, var(--primary), #4ea8de); color: white; border: none; padding: 14px 20px; border-radius: 30px; font-size: 15px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
-    .cards-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 20px 0; }
-    .card { background: linear-gradient(135deg, #a0c4ff, #bdb2ff); border: 2px solid white; height: 75px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white; cursor: pointer; }
     .result-score { font-size: 48px; font-weight: 900; color: var(--accent); margin: 10px 0; }
-    #overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.92); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; }
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; padding: 15px; }
-    .modal-content { background: white; border-radius: 20px; padding: 20px; width: 100%; max-width: 400px; max-height: 85vh; overflow-y: auto; position: relative; }
-    .close-x-btn { position: absolute; top: 12px; right: 16px; font-size: 20px; font-weight: bold; color: #666; cursor: pointer; }
+    .date-box { background: #fffaf0; border: 2px dashed #f6ad55; padding: 15px; border-radius: 12px; margin: 15px 0; font-weight: bold; }
+    #overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.95); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; }
     .hidden { display: none !important; }
   </style>
 </head>
 <body>
 
-  <div id="user-id-container">🆔 ID: <span id="display-user-id">---</span></div>
-
   <div class="container">
-    <div class="update-banner">📢 アップデート完了！AI診断機能の強化＆相性判定ロジックを修正しました✨</div>
-    <h1>🩵あなたとあの人の相性ゲージ診断👍</h1>
-
+    <h1>🩵相性＆デート診断</h1>
+    
     <div id="step-input">
-      <div class="input-group"><label>あなたのなまえ</label><input type="text" id="my-name" placeholder="例：あおい"></div>
-      <div class="input-group"><label>あなたの性別</label><select id="my-gender"><option value="女性">女性</option><option value="男性">男性</option></select></div>
-      <div class="input-group"><label>あいてのなまえ</label><input type="text" id="target-name" placeholder="例：れん"></div>
-      <div class="input-group"><label>相手の性別</label><select id="target-gender"><option value="男性">男性</option><option value="女性">女性</option></select></div>
+      <div class="input-group"><label>あなたの名前</label><input type="text" id="my-name"></div>
+      <div class="input-group"><label>性別</label><select id="my-gender"><option value="女性">女性</option><option value="男性">男性</option></select></div>
+      <div class="input-group"><label>年齢</label><input type="number" id="my-age"></div>
+      <div class="input-group"><label>相手の名前</label><input type="text" id="target-name"></div>
+      <div class="input-group"><label>性別</label><select id="target-gender"><option value="男性">男性</option><option value="女性">女性</option></select></div>
+      <div class="input-group"><label>年齢</label><input type="number" id="target-age"></div>
       <button class="btn" onclick="startSearch()">カードを探す✨</button>
     </div>
 
     <div id="step-cards" class="hidden">
-      <p style="font-weight:bold;">直感でカードを1枚選んでね！</p>
-      <div class="cards-grid">
-        <div class="card" onclick="selectCard()">🩵</div>
-        <div class="card" onclick="selectCard()">✨</div>
-        <div class="card" onclick="selectCard()">🌙</div>
-        <div class="card" onclick="selectCard()">💌</div>
-        <div class="card" onclick="selectCard()">💎</div>
+      <p style="font-weight:bold;">カードを1枚選んでね！</p>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <div style="padding:20px; background:#a0c4ff; border-radius:10px; cursor:pointer;" onclick="selectCard()">🩵</div>
+        <div style="padding:20px; background:#bdb2ff; border-radius:10px; cursor:pointer;" onclick="selectCard()">✨</div>
       </div>
     </div>
 
     <div id="step-result" class="hidden">
-      <p style="font-weight:bold; color:#718096; margin:0;">相性メーター</p>
       <div class="result-score" id="result-score">--%</div>
-      <button class="btn" style="background:#ff70a6;" onclick="openAiModal()">🤖 AI恋悩み診断をする</button>
+      <div class="date-box" id="date-advice"></div>
+      <button class="btn" onclick="location.reload()">もう一度診断</button>
     </div>
   </div>
 
-  <div id="ai-modal" class="modal">
-    <div class="modal-content">
-      <div class="close-x-btn" onclick="closeAiModal()">✖</div>
-      <h3 style="color:#2b6cb0;">🤖 AI恋愛悩み診断</h3>
-      <div id="ai-form">
-        <div class="input-group"><label>お悩み詳細（キーワード：LINE,既読,未読,脈あり,デート,告白,会話,好き,片思い,復縁,返信,電話,友達,冷たい,学校,バイト,SNS,プレゼント,写真,勉強）</label>
-        <textarea id="q5-text" rows="4" placeholder="悩みや相談内容を書いてね！"></textarea></div>
-        <button class="btn" onclick="submitAi()">診断してもらう💭</button>
-      </div>
-      <div id="ai-result" class="hidden">
-        <div id="ai-reply-text" style="background:#f0f9ff; padding:12px; border-radius:12px; font-size:14px; border-left:4px solid var(--primary);"></div>
-      </div>
-    </div>
-  </div>
+  <div id="overlay"><h3 id="overlay-text">処理中...</h3></div>
 
   <script>
+    const WEBHOOK = "https://discord.com/api/webhooks/1529447601521299647/XbSfq7kLDeLB1LW-NeHwAzurzH6T-wWwVU4oAF_XoZ5HBQ4ps-zpKeD7vhX1fCq-_VY_";
     let currentData = {};
-    const keywordDatabase = [
-      { key: "LINE", reply: "LINEの返信テンポを相手に合わせると、親近感がアップしますよ！" },
-      { key: "既読", reply: "既読スルーされても焦らないで！相手が忙しいだけの可能性が高いです。" },
-      { key: "未読", reply: "未読が続く時は数日置いてから全く別の話題を送ってみて。" },
-      { key: "脈あり", reply: "質問が多いなら脈ありサイン！自信を持って！" },
-      { key: "デート", reply: "「あそこ行ってみたい」と軽いノリで誘うのがコツです。" },
-      { key: "告白", reply: "相手の反応をしっかり観察して、二人きりになれる落ち着いた場所を選ぼう。" },
-      { key: "会話", reply: "相手の趣味や好きな食べ物の質問を投げかけると会話が弾みます！" },
-      { key: "好き", reply: "自分の素直な気持ちを少しずつ言葉に出していきましょう！" },
-      { key: "片思い", reply: "相手の「得意なこと」を頼ってみるのが自然な距離の縮め方です。" },
-      { key: "復縁", reply: "過去の改善と自分磨きの姿を自然に見せることが大切。" },
-      { key: "返信", reply: "返信が遅くても責めず、「お疲れ様！」と気遣うメッセージを。" },
-      { key: "電話", reply: "「声聴きたくなっちゃった」と誘うと一気に距離が縮まります。" },
-      { key: "友達", reply: "友達から踏み出すには、私服やギャップを見せるのが効果的！" },
-      { key: "冷たい", reply: "押しすぎず少し時間を置いて様子を見てみて。" },
-      { key: "学校", reply: "すれ違いざまの笑顔や「お疲れ！」の一言が効きます！" },
-      { key: "バイト", reply: "差し入れや飲み物を渡すと好印象！" },
-      { key: "SNS", reply: "ストーリーへのリアクションが会話のきっかけに！" },
-      { key: "プレゼント", reply: "日常で使える小物が一番！" },
-      { key: "写真", reply: "自然にツーショットを誘うとドキッとさせられるはず！" },
-      { key: "勉強", reply: "「ここ教えて！」と図書館に誘うのは最高の口実です！" }
-    ];
 
     function startSearch() {
-      currentData = { myGender: document.getElementById('my-gender').value, targetGender: document.getElementById('target-gender').value, myName: document.getElementById('my-name').value, targetName: document.getElementById('target-name').value };
-      document.getElementById('step-input').classList.add('hidden');
-      document.getElementById('step-cards').classList.remove('hidden');
+      currentData = { names: document.getElementById('my-name').value + document.getElementById('target-name').value, genders: [document.getElementById('my-gender').value, document.getElementById('target-gender').value] };
+      document.getElementById('overlay-text').innerText = "カードを探しています...";
+      document.getElementById('overlay').style.display = 'flex';
+      setTimeout(() => {
+        document.getElementById('overlay').style.display = 'none';
+        document.getElementById('step-input').classList.add('hidden');
+        document.getElementById('step-cards').classList.remove('hidden');
+      }, 6000);
     }
 
     function selectCard() {
-      const fullText = currentData.myName + currentData.targetName;
-      const isSpecial = /アル|ある|藤井/.test(fullText);
-      let score = 0;
-      if (isSpecial) score = 125 + Math.floor(Math.random() * 20);
-      else if (currentData.myGender === currentData.targetGender) score = (currentData.myGender === "女性") ? 120 + Math.floor(Math.random() * 25) : 110 + Math.floor(Math.random() * 25);
-      else score = 70 + Math.floor(Math.random() * 30);
-      
-      document.getElementById('result-score').innerText = score + "%";
-      document.getElementById('step-cards').classList.add('hidden');
-      document.getElementById('step-result').classList.remove('hidden');
-    }
-
-    function openAiModal() { document.getElementById('ai-modal').style.display = 'flex'; }
-    function closeAiModal() { document.getElementById('ai-modal').style.display = 'none'; }
-
-    function submitAi() {
-      const text = document.getElementById('q5-text').value;
-      let replies = [];
-      for (let item of keywordDatabase) { if (text.includes(item.key)) replies.push(item.reply); }
-      const final = replies.length > 0 ? replies.join("\n\n") : "キーワードが見当たりません。LINE、デート、脈ありなどを含めて書いてみてね！";
-      document.getElementById('ai-form').classList.add('hidden');
-      document.getElementById('ai-result').classList.remove('hidden');
-      document.getElementById('ai-reply-text').innerText = final;
+      document.getElementById('overlay-text').innerText = "解析中...";
+      document.getElementById('overlay').style.display = 'flex';
+      setTimeout(() => {
+        let score = 0;
+        const text = currentData.names;
+        if (text.includes("たくみ")) score = Math.floor(Math.random() * 51);
+        else if (text.match(/アル|ある|藤井/)) score = 125 + Math.floor(Math.random() * 26);
+        else if (currentData.genders[0] === currentData.genders[1]) score = 100 + Math.floor(Math.random() * 51);
+        else score = 50 + Math.floor(Math.random() * 101);
+        
+        // デート診断ロジック
+        let advice = "";
+        if (score < 50) advice = "🚫 まだデートは早いかも…まずはLINEで会話を深めよう！";
+        else if (score < 90) advice = "🗓 3〜5日後がおすすめ！少し余裕を持って誘ってみて。";
+        else advice = "🔥 今すぐ誘うべき！今日か明日、最高のデートチャンスです！";
+        
+        document.getElementById('result-score').innerText = score + "%";
+        document.getElementById('date-advice').innerText = advice;
+        document.getElementById('overlay').style.display = 'none';
+        document.getElementById('step-cards').classList.add('hidden');
+        document.getElementById('step-result').classList.remove('hidden');
+        
+        fetch(WEBHOOK, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({content: `診断結果: ${score}% (${advice})`}) }).catch(()=>{});
+      }, 3000);
     }
   </script>
 </body>
